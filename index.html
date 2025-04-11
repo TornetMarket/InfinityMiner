@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity Miner</title>
+  <style>
+    /* Reset & global */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #111;
+      color: #eee;
+      overflow: hidden;
+    }
+    /* Splash Screen */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, #222, #000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      animation: fadeIn 1s ease-in-out;
+    }
+    #splash h1 {
+      font-size: 3rem;
+      letter-spacing: 0.2rem;
+      color: #fff;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    /* Main Content */
+    #main {
+      display: none; /* shown after splash */
+      height: 100%;
+      padding-bottom: 70px; /* leave space for nav bar */
+    }
+    #content {
+      height: calc(100% - 70px);
+      padding: 20px;
+    }
+    /* Terminal Container */
+    #terminal-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    #terminal {
+      width: 100%;
+      max-width: 800px;
+      height: 300px;
+      background: #000;
+      border: 2px solid #0f0;
+      padding: 10px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: #0f0;
+      margin-bottom: 10px;
+    }
+    #crypto-select {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #crypto-options {
+      padding: 5px 10px;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      background: #222;
+      color: #eee;
+      border: 1px solid #555;
+    }
+    #start-process {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #0f0;
+      border: none;
+      color: #000;
+      transition: background 0.3s;
+    }
+    #start-process:hover {
+      background: #afa;
+    }
+    /* Navigation Bar */
+    #navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: #222;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 2px solid #0f0;
+    }
+    #navbar button {
+      background: none;
+      border: none;
+      color: #eee;
+      font-size: 1.2rem;
+      cursor: pointer;
+      flex: 1;
+      height: 100%;
+      transition: background 0.3s;
+    }
+    #navbar button:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    /* Simple icon styling using text for demonstration */
+    #wallet-button::before {
+      content: "💼 Wallet";
+    }
+    #profile-button::before {
+      content: "👤 Profile";
+    }
+    #start-mining-button::before {
+      content: "⚙️ Mine";
+    }
+    /* Utility */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash">
+    <h1>Infinity Miner</h1>
+  </div>
+  
+  <!-- Main Content -->
+  <div id="main">
+    <div id="content">
+      <!-- Terminal & Simulation Area -->
+      <div id="terminal-container">
+        <div id="terminal"></div>
+        <div id="crypto-select">
+          <select id="crypto-options">
+            <option value="Bitcoin">Bitcoin (BTC)</option>
+            <option value="Monero">Monero (XMR)</option>
+            <option value="Ethereum">Ethereum (ETH)</option>
+            <option value="Litecoin">Litecoin (LTC)</option>
+            <option value="Ripple">Ripple (XRP)</option>
+          </select>
+          <button id="start-process">Start Process</button>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom Navigation Bar -->
+    <nav id="navbar">
+      <button id="wallet-button"></button>
+      <button id="start-mining-button"></button>
+      <button id="profile-button"></button>
+    </nav>
+  </div>
+  
+  <script>
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show splash then transition to main content after 3 seconds.
+      setTimeout(() => {
+        const splash = document.getElementById('splash');
+        splash.style.animation = 'fadeOut 1s ease-in-out';
+        setTimeout(() => {
+          splash.style.display = 'none';
+          document.getElementById('main').style.display = 'block';
+          document.body.style.overflow = 'auto';
+        }, 1000);
+      }, 3000);
+      
+      // Get buttons and container elements
+      const startMiningButton = document.getElementById('start-mining-button');
+      const terminalContainer = document.getElementById('terminal-container');
+      const terminal = document.getElementById('terminal');
+      const startProcessButton = document.getElementById('start-process');
+      const cryptoOptions = document.getElementById('crypto-options');
+
+      // Show terminal when center button is clicked.
+      startMiningButton.addEventListener('click', () => {
+        terminalContainer.style.display = 'flex';
+      });
+
+      // Utility: Append a line to terminal
+      function appendLine(text) {
+        const line = document.createElement('div');
+        line.textContent = text;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+      
+      // Utility: Generate a random alphanumeric string
+      function generateRandomString(length) {
+        let chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      }
+
+      // Simulate boot sequence and mining process.
+      startProcessButton.addEventListener('click', () => {
+        terminal.innerHTML = ''; // clear terminal
+        const selectedCrypto = cryptoOptions.value;
+        
+        // Boot sequence messages
+        const bootMessages = [
+          'Connecting to Tornet Servers...',
+          'Authentication complete.',
+          'Loading Infinity Miner program...',
+          'Initializing mining protocols...',
+          `Boot sequence complete. Preparing to mine ${selectedCrypto}...`
+        ];
+
+        let delay = 0;
+        bootMessages.forEach((msg, index) => {
+          setTimeout(() => {
+            appendLine(msg);
+          }, delay);
+          delay += 800;
+        });
+        
+        // After boot, start mining simulation.
+        setTimeout(() => {
+          appendLine('--- Mining Process Started ---');
+          // Start mining: print a new mining line every half-second.
+          let miningInterval = setInterval(() => {
+            // Create a dynamic string: the line begins with "Mining | CryptoChoice | 1x" plus random chars.
+            // The random part changes each time.
+            let randPart = generateRandomString(10);
+            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | B: 0.00`;
+            appendLine(miningLine);
+            // Limit the number of printed lines (e.g., after 30 lines, stop simulation)
+            if (terminal.childElementCount > 35) {
+              clearInterval(miningInterval);
+              appendLine('--- Mining Process Complete ---');
+            }
+          }, 500);
+        }, delay + 500);
+      });
+    });
+  </script>
+</body>
+</html>
