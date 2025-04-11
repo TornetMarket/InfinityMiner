@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Infinity Miner</title>
   <style>
-    /* Reset & global */
+    /* Reset & Global Styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    body, html {
+    html, body {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #111;
@@ -101,7 +101,7 @@
     #start-process:hover {
       background: #afa;
     }
-    /* Navigation Bar */
+    /* Bottom Navigation Bar */
     #navbar {
       position: fixed;
       bottom: 0;
@@ -127,7 +127,7 @@
     #navbar button:hover {
       background: rgba(255, 255, 255, 0.1);
     }
-    /* Simple icon styling using text for demonstration */
+    /* Icon Styling for Demo Purposes */
     #wallet-button::before {
       content: "💼 Wallet";
     }
@@ -136,10 +136,6 @@
     }
     #start-mining-button::before {
       content: "⚙️ Mine";
-    }
-    /* Utility */
-    .hidden {
-      display: none;
     }
   </style>
 </head>
@@ -199,12 +195,12 @@
       let miningInterval = null;
       let processActive = false;
       
-      // Show terminal when center nav button is clicked.
+      // Show terminal when the center nav button is clicked.
       startMiningButton.addEventListener('click', () => {
         terminalContainer.style.display = 'flex';
       });
       
-      // Append a line to terminal.
+      // Append a line to the terminal.
       function appendLine(text) {
         const line = document.createElement('div');
         line.textContent = text;
@@ -222,26 +218,23 @@
         return result;
       }
       
-      // Randomly pick a B value or valid token message.
-      function getBalanceMessage() {
-        // Standard values and a chance for valid token.
+      // Randomly pick a balance value.
+      // 90% chance to choose a standard low balance, 10% chance for a valid token (from a higher range).
+      function getBalanceValue() {
         const standard = [ "0.00", "0.01", "0.02", "0.03", "0.06" ];
-        // 10% chance to mine a valid token.
+        const validOptions = [ "0.10", "0.12", "0.15" ];
         if (Math.random() < 0.1) {
-          // Random balance from the standard values (except 0.00)
-          const validOptions = standard.slice(1);
-          const bal = validOptions[Math.floor(Math.random() * validOptions.length)];
-          return `VALID TOKEN MINED: BAL: ${bal}`;
+          return validOptions[Math.floor(Math.random() * validOptions.length)];
         } else {
           return standard[Math.floor(Math.random() * standard.length)];
         }
       }
       
-      // Start boot sequence and mining process.
+      // Start the mining process including boot sequence and mining loop.
       function startMiningProcess() {
-        terminal.innerHTML = ''; // clear terminal
+        terminal.innerHTML = ''; // Clear the terminal.
         const selectedCrypto = cryptoOptions.value;
-        // Change button to Terminate Process in red.
+        // Change the button to "Terminate Process" in red.
         startProcessButton.textContent = 'Terminate Process';
         startProcessButton.style.background = '#f00';
         processActive = true;
@@ -262,27 +255,23 @@
           delay += 800;
         });
         
-        // Begin mining simulation after boot sequence.
+        // Begin the mining simulation after the boot messages.
         setTimeout(() => {
           appendLine('--- Mining Process Started ---');
           miningInterval = setInterval(() => {
-            // Generate a random alphanumeric part.
+            // Generate a random alphanumeric sequence.
             const randPart = generateRandomString(10);
-            // Use getBalanceMessage to determine the B value or valid token message.
-            const balanceMsg = getBalanceMessage();
-            // If the balance message indicates a valid token, show that line.
-            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | B: ${balanceMsg}`;
+            // Get a random balance value.
+            const balanceVal = getBalanceValue();
+            // Build and append the mining output line.
+            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | BAL: ${balanceVal}`;
             appendLine(miningLine);
-            
-            // Optionally, auto-stop after a certain number of lines (for simulation limits).
-            if (terminal.childElementCount > 35) {
-              terminateMiningProcess();
-            }
-          }, 500);
+          }, 100);
         }, delay + 500);
       }
       
-      // Terminate mining process: stops the interval, clears terminal, shows termination message.
+      // Terminate the mining process: stop the interval, clear the terminal,
+      // and then show a termination message for 3 seconds before clearing and resetting.
       function terminateMiningProcess() {
         if (!processActive) return;
         processActive = false;
@@ -290,15 +279,15 @@
         terminal.innerHTML = '';
         const selectedCrypto = cryptoOptions.value;
         appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}) 0.00`);
-        // Reset the process button after showing termination message.
         setTimeout(() => {
           terminal.innerHTML = '';
+          // Reset the process button.
           startProcessButton.textContent = 'Start Process';
           startProcessButton.style.background = '#0f0';
         }, 3000);
       }
       
-      // Event listener for Start/Terminate Process button.
+      // Toggle the process when the Start/Terminate Process button is clicked.
       startProcessButton.addEventListener('click', () => {
         if (!processActive) {
           startMiningProcess();
