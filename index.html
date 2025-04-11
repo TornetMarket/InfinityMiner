@@ -194,7 +194,8 @@
       // Process control variables.
       let miningInterval = null;
       let processActive = false;
-      
+      let totalMined = 0; // Running total of mined crypto.
+
       // Show terminal when the center nav button is clicked.
       startMiningButton.addEventListener('click', () => {
         terminalContainer.style.display = 'flex';
@@ -218,21 +219,24 @@
         return result;
       }
       
-      // Randomly pick a balance value.
-      // 90% chance to choose a standard low balance, 10% chance for a valid token (from a higher range).
+      // Choose the BAL value based on defined probabilities.
       function getBalanceValue() {
-        const standard = [ "0.00", "0.01", "0.02", "0.03", "0.06" ];
-        const validOptions = [ "0.10", "0.12", "0.15" ];
-        if (Math.random() < 0.1) {
-          return validOptions[Math.floor(Math.random() * validOptions.length)];
+        const rand = Math.random();
+        if (rand < 0.75) {
+          return 0.00;
+        } else if (rand < 0.75 + 0.15) {
+          return 0.01;
+        } else if (rand < 0.75 + 0.15 + 0.05) {
+          return 0.02;
         } else {
-          return standard[Math.floor(Math.random() * standard.length)];
+          return 0.03;
         }
       }
       
-      // Start the mining process including boot sequence and mining loop.
+      // Start mining process including boot sequence and mining loop.
       function startMiningProcess() {
         terminal.innerHTML = ''; // Clear the terminal.
+        totalMined = 0; // Reset total.
         const selectedCrypto = cryptoOptions.value;
         // Change the button to "Terminate Process" in red.
         startProcessButton.textContent = 'Terminate Process';
@@ -261,10 +265,12 @@
           miningInterval = setInterval(() => {
             // Generate a random alphanumeric sequence.
             const randPart = generateRandomString(10);
-            // Get a random balance value.
-            const balanceVal = getBalanceValue();
+            // Get a random balance value based on distribution.
+            const balanceValue = getBalanceValue();
+            // Update the running total.
+            totalMined += balanceValue;
             // Build and append the mining output line.
-            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | BAL: ${balanceVal}`;
+            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | BAL: ${balanceValue.toFixed(2)}`;
             appendLine(miningLine);
           }, 100);
         }, delay + 500);
@@ -278,7 +284,8 @@
         clearInterval(miningInterval);
         terminal.innerHTML = '';
         const selectedCrypto = cryptoOptions.value;
-        appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}) 0.00`);
+        let totalDisplay = totalMined.toFixed(2);
+        appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}): ${totalDisplay}`);
         setTimeout(() => {
           terminal.innerHTML = '';
           // Reset the process button.
