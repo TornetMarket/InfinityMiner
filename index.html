@@ -14,8 +14,7 @@
     html, body {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      /* Royal blue gradient background */
-      background: linear-gradient(135deg, #27408b, #4169e1);
+      background: #111; /* dark grey/almost black background */
       color: #eee;
       overflow: hidden;
     }
@@ -26,7 +25,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle, #27408b, #1a237e);
+      background: radial-gradient(circle, #111, #000);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -36,7 +35,8 @@
     #splash h1 {
       font-size: 3rem;
       letter-spacing: 0.2rem;
-      color: #fff;
+      /* Royal blue text for the main Infinity Miner */
+      color: #4169e1;
     }
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -48,9 +48,9 @@
     }
     /* Main Content */
     #main {
-      display: none; /* Shown after splash */
+      display: none; /* shown after splash */
       height: 100%;
-      padding-bottom: 70px; /* Leave space for nav bar */
+      padding-bottom: 70px; /* space for nav bar */
     }
     #content {
       height: calc(100% - 70px);
@@ -102,7 +102,7 @@
       padding: 5px 10px;
       font-size: 1rem;
       margin-bottom: 10px;
-      background: #27408b;
+      background: #222;
       color: #eee;
       border: 1px solid #4169e1;
     }
@@ -126,7 +126,7 @@
       left: 0;
       width: 100%;
       height: 70px;
-      background: #27408b;
+      background: #222;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -277,7 +277,7 @@
       function startMiningProcess() {
         terminal.innerHTML = ''; // Clear the terminal.
         totalMined = 0; // Reset total.
-        updateSessionPot(); 
+        updateSessionPot();
         const selectedCrypto = cryptoOptions.value;
         // Change the button to "Terminate Process" in red.
         startProcessButton.textContent = 'Terminate Process';
@@ -304,22 +304,17 @@
         setTimeout(() => {
           appendLine('--- Mining Process Started ---');
           miningInterval = setInterval(() => {
-            // Generate a random alphanumeric sequence.
             const randPart = generateRandomString(10);
-            // Get a random balance value based on the defined distribution.
             const balanceValue = getBalanceValue();
-            // Update the running total.
             totalMined += balanceValue;
             updateSessionPot();
-            // Build and append the mining output line.
             let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | BAL: ${balanceValue.toFixed(2)}`;
             appendLine(miningLine);
           }, 100);
         }, miningStartDelay);
       }
       
-      // Terminate the mining process: stop the interval, clear the terminal,
-      // and show a termination message with the session total for 3 seconds before resetting.
+      // Terminate the mining process.
       function terminateMiningProcess() {
         if (!processActive) return;
         processActive = false;
@@ -330,7 +325,6 @@
         appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}): ${totalDisplay}`);
         setTimeout(() => {
           terminal.innerHTML = '';
-          // Reset the process button.
           startProcessButton.textContent = 'Start Process';
           startProcessButton.style.background = '#4169e1';
         }, 3000);
