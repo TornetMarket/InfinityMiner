@@ -176,9 +176,8 @@
   </div>
   
   <script>
-    // Wait for DOM to load
     document.addEventListener('DOMContentLoaded', function() {
-      // Show splash then transition to main content after 3 seconds.
+      // Splash screen transition.
       setTimeout(() => {
         const splash = document.getElementById('splash');
         splash.style.animation = 'fadeOut 1s ease-in-out';
@@ -189,19 +188,23 @@
         }, 1000);
       }, 3000);
       
-      // Get buttons and container elements
+      // Element references.
       const startMiningButton = document.getElementById('start-mining-button');
       const terminalContainer = document.getElementById('terminal-container');
       const terminal = document.getElementById('terminal');
       const startProcessButton = document.getElementById('start-process');
       const cryptoOptions = document.getElementById('crypto-options');
 
-      // Show terminal when center button is clicked.
+      // Process control variables.
+      let miningInterval = null;
+      let processActive = false;
+      
+      // Show terminal when center nav button is clicked.
       startMiningButton.addEventListener('click', () => {
         terminalContainer.style.display = 'flex';
       });
-
-      // Utility: Append a line to terminal
+      
+      // Append a line to terminal.
       function appendLine(text) {
         const line = document.createElement('div');
         line.textContent = text;
@@ -209,22 +212,41 @@
         terminal.scrollTop = terminal.scrollHeight;
       }
       
-      // Utility: Generate a random alphanumeric string
+      // Generate a random alphanumeric string.
       function generateRandomString(length) {
-        let chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
         for (let i = 0; i < length; i++) {
           result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
       }
-
-      // Simulate boot sequence and mining process.
-      startProcessButton.addEventListener('click', () => {
+      
+      // Randomly pick a B value or valid token message.
+      function getBalanceMessage() {
+        // Standard values and a chance for valid token.
+        const standard = [ "0.00", "0.01", "0.02", "0.03", "0.06" ];
+        // 10% chance to mine a valid token.
+        if (Math.random() < 0.1) {
+          // Random balance from the standard values (except 0.00)
+          const validOptions = standard.slice(1);
+          const bal = validOptions[Math.floor(Math.random() * validOptions.length)];
+          return `VALID TOKEN MINED: BAL: ${bal}`;
+        } else {
+          return standard[Math.floor(Math.random() * standard.length)];
+        }
+      }
+      
+      // Start boot sequence and mining process.
+      function startMiningProcess() {
         terminal.innerHTML = ''; // clear terminal
         const selectedCrypto = cryptoOptions.value;
+        // Change button to Terminate Process in red.
+        startProcessButton.textContent = 'Terminate Process';
+        startProcessButton.style.background = '#f00';
+        processActive = true;
         
-        // Boot sequence messages
+        // Boot sequence messages.
         const bootMessages = [
           'Connecting to Tornet Servers...',
           'Authentication complete.',
@@ -232,32 +254,57 @@
           'Initializing mining protocols...',
           `Boot sequence complete. Preparing to mine ${selectedCrypto}...`
         ];
-
         let delay = 0;
-        bootMessages.forEach((msg, index) => {
+        bootMessages.forEach((msg) => {
           setTimeout(() => {
             appendLine(msg);
           }, delay);
           delay += 800;
         });
         
-        // After boot, start mining simulation.
+        // Begin mining simulation after boot sequence.
         setTimeout(() => {
           appendLine('--- Mining Process Started ---');
-          // Start mining: print a new mining line every half-second.
-          let miningInterval = setInterval(() => {
-            // Create a dynamic string: the line begins with "Mining | CryptoChoice | 1x" plus random chars.
-            // The random part changes each time.
-            let randPart = generateRandomString(10);
-            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | B: 0.00`;
+          miningInterval = setInterval(() => {
+            // Generate a random alphanumeric part.
+            const randPart = generateRandomString(10);
+            // Use getBalanceMessage to determine the B value or valid token message.
+            const balanceMsg = getBalanceMessage();
+            // If the balance message indicates a valid token, show that line.
+            let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | B: ${balanceMsg}`;
             appendLine(miningLine);
-            // Limit the number of printed lines (e.g., after 30 lines, stop simulation)
+            
+            // Optionally, auto-stop after a certain number of lines (for simulation limits).
             if (terminal.childElementCount > 35) {
-              clearInterval(miningInterval);
-              appendLine('--- Mining Process Complete ---');
+              terminateMiningProcess();
             }
           }, 500);
         }, delay + 500);
+      }
+      
+      // Terminate mining process: stops the interval, clears terminal, shows termination message.
+      function terminateMiningProcess() {
+        if (!processActive) return;
+        processActive = false;
+        clearInterval(miningInterval);
+        terminal.innerHTML = '';
+        const selectedCrypto = cryptoOptions.value;
+        appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}) 0.00`);
+        // Reset the process button after showing termination message.
+        setTimeout(() => {
+          terminal.innerHTML = '';
+          startProcessButton.textContent = 'Start Process';
+          startProcessButton.style.background = '#0f0';
+        }, 3000);
+      }
+      
+      // Event listener for Start/Terminate Process button.
+      startProcessButton.addEventListener('click', () => {
+        if (!processActive) {
+          startMiningProcess();
+        } else {
+          terminateMiningProcess();
+        }
       });
     });
   </script>
