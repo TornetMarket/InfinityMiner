@@ -97,9 +97,27 @@
       border: none;
       color: #000;
       transition: background 0.3s;
+      margin-bottom: 20px;
     }
     #start-process:hover {
       background: #afa;
+    }
+    /* Session Pot Table */
+    #session-pot {
+      display: none;
+      margin-top: 10px;
+    }
+    #session-pot table {
+      border-collapse: collapse;
+      background: #222;
+      color: #0f0;
+      width: 100%;
+      max-width: 400px;
+    }
+    #session-pot th, #session-pot td {
+      padding: 10px;
+      border: 1px solid #0f0;
+      text-align: center;
     }
     /* Bottom Navigation Bar */
     #navbar {
@@ -160,6 +178,22 @@
             <option value="Ripple">Ripple (XRP)</option>
           </select>
           <button id="start-process">Start Process</button>
+          <!-- Session Pot Table -->
+          <div id="session-pot">
+            <table>
+              <thead>
+                <tr>
+                  <th colspan="2">Current Session Pot</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Total Mined</td>
+                  <td id="session-total">0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -190,6 +224,8 @@
       const terminal = document.getElementById('terminal');
       const startProcessButton = document.getElementById('start-process');
       const cryptoOptions = document.getElementById('crypto-options');
+      const sessionPot = document.getElementById('session-pot');
+      const sessionTotalCell = document.getElementById('session-total');
 
       // Process control variables.
       let miningInterval = null;
@@ -233,33 +269,41 @@
         }
       }
       
+      // Update the session pot table.
+      function updateSessionPot() {
+        sessionTotalCell.textContent = totalMined.toFixed(2);
+      }
+      
       // Start mining process including boot sequence and mining loop.
       function startMiningProcess() {
         terminal.innerHTML = ''; // Clear the terminal.
         totalMined = 0; // Reset total.
+        updateSessionPot(); // Update table immediately.
+        // Show the session pot table.
+        sessionPot.style.display = 'block';
         const selectedCrypto = cryptoOptions.value;
         // Change the button to "Terminate Process" in red.
         startProcessButton.textContent = 'Terminate Process';
         startProcessButton.style.background = '#f00';
         processActive = true;
         
-        // Boot sequence messages.
+        // Boot sequence messages with varying delays.
         const bootMessages = [
-          'Connecting to Tornet Servers...',
-          'Authentication complete.',
-          'Loading Infinity Miner program...',
-          'Initializing mining protocols...',
-          `Boot sequence complete. Preparing to mine ${selectedCrypto}...`
+          { text: 'Connecting to Tornet Servers...', delay: 1000 },
+          { text: 'Authentication complete.', delay: 1500 },
+          { text: 'Loading Infinity Miner program...', delay: 2000 },
+          { text: 'Initializing mining protocols...', delay: 2500 },
+          { text: `Boot sequence complete. Preparing to mine ${selectedCrypto}...`, delay: 3000 }
         ];
-        let delay = 0;
-        bootMessages.forEach((msg) => {
+        
+        bootMessages.forEach(msgObj => {
           setTimeout(() => {
-            appendLine(msg);
-          }, delay);
-          delay += 800;
+            appendLine(msgObj.text);
+          }, msgObj.delay);
         });
         
-        // Begin the mining simulation after the boot messages.
+        // Begin the mining simulation after the boot sequence.
+        const miningStartDelay = bootMessages[bootMessages.length - 1].delay + 500;
         setTimeout(() => {
           appendLine('--- Mining Process Started ---');
           miningInterval = setInterval(() => {
@@ -269,15 +313,16 @@
             const balanceValue = getBalanceValue();
             // Update the running total.
             totalMined += balanceValue;
+            updateSessionPot();
             // Build and append the mining output line.
             let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | BAL: ${balanceValue.toFixed(2)}`;
             appendLine(miningLine);
           }, 100);
-        }, delay + 500);
+        }, miningStartDelay);
       }
       
       // Terminate the mining process: stop the interval, clear the terminal,
-      // and then show a termination message for 3 seconds before clearing and resetting.
+      // and then show a termination message including the current session pot for 3 seconds before resetting.
       function terminateMiningProcess() {
         if (!processActive) return;
         processActive = false;
@@ -286,11 +331,14 @@
         const selectedCrypto = cryptoOptions.value;
         let totalDisplay = totalMined.toFixed(2);
         appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}): ${totalDisplay}`);
+        // Keep the session pot visible during termination.
         setTimeout(() => {
           terminal.innerHTML = '';
           // Reset the process button.
           startProcessButton.textContent = 'Start Process';
           startProcessButton.style.background = '#0f0';
+          // Hide the session pot table.
+          sessionPot.style.display = 'none';
         }, 3000);
       }
       
