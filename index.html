@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Infinity Miner</title>
+  <link rel="icon" type="image/png" href="miner.png">
   <style>
     /* Reset & Global Styles */
     * {
@@ -63,6 +64,15 @@
       align-items: center;
       margin-top: 20px;
     }
+    /* Wallet/Portfolio Page Container */
+    #wallet-page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 20px;
+    }
     /* Session Pot placed above the terminal */
     #session-pot {
       margin-bottom: 20px;
@@ -118,6 +128,42 @@
     }
     #start-process:hover {
       background: #5a7bd5;
+    }
+    /* Wallet/Portfolio Page Styling */
+    #wallet-page h2 {
+      margin-bottom: 20px;
+    }
+    #wallet-balance {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: #222;
+      border: 4px solid #4169e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: #4169e1;
+      margin-bottom: 30px;
+    }
+    .wallet-action {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #4169e1;
+      color: #fff;
+      transition: background 0.3s;
+    }
+    .wallet-action:hover {
+      background: #5a7bd5;
+    }
+    #wallet-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     /* Bottom Navigation Bar */
     #navbar {
@@ -192,8 +238,20 @@
             <option value="Ethereum">Ethereum (ETH)</option>
             <option value="Litecoin">Litecoin (LTC)</option>
             <option value="Ripple">Ripple (XRP)</option>
+            <option value="RichCoin">RichCoin (RTC)</option>
           </select>
           <button id="start-process">Start Process</button>
+        </div>
+      </div>
+      <!-- Wallet/Portfolio Page -->
+      <div id="wallet-page">
+        <h2>Portfolio</h2>
+        <div id="wallet-balance">$0.00</div>
+        <div id="wallet-actions">
+          <button class="wallet-action">🛒 Buy</button>
+          <button class="wallet-action">💰 Sell</button>
+          <button class="wallet-action">🔄 Trade</button>
+          <button class="wallet-action">🏦 Deposit</button>
         </div>
       </div>
     </div>
@@ -225,15 +283,20 @@
       const startProcessButton = document.getElementById('start-process');
       const cryptoOptions = document.getElementById('crypto-options');
       const sessionTotalCell = document.getElementById('session-total');
-  
+      const walletButton = document.getElementById('wallet-button');
+      const walletPage = document.getElementById('wallet-page');
+      const walletBalanceCircle = document.getElementById('wallet-balance');
+      
       // Process control variables.
       let miningInterval = null;
       let processActive = false;
-      let totalMined = 0; // Running total of mined crypto.
-  
-      // Show terminal when the center nav button is clicked.
+      let sessionMined = 0; // Running total of mined crypto for the session.
+      let walletBalance = 0; // Global wallet balance.
+      
+      // Show terminal when the center nav button ("Mine") is clicked.
       startMiningButton.addEventListener('click', () => {
         terminalContainer.style.display = 'flex';
+        walletPage.style.display = 'none';
       });
       
       // Append a line to the terminal.
@@ -270,13 +333,19 @@
       
       // Update the session pot display.
       function updateSessionPot() {
-        sessionTotalCell.textContent = totalMined.toFixed(2);
+        sessionTotalCell.textContent = sessionMined.toFixed(2);
+      }
+      
+      // Update wallet balance display (converting mined crypto to dollars).
+      // Each 0.01 is worth 10 cents, so multiply by 10.
+      function updateWalletBalanceDisplay() {
+        walletBalanceCircle.textContent = '$' + (walletBalance * 10).toFixed(2);
       }
       
       // Start mining process including boot sequence and mining loop.
       function startMiningProcess() {
         terminal.innerHTML = ''; // Clear the terminal.
-        totalMined = 0; // Reset total.
+        sessionMined = 0; // Reset session total.
         updateSessionPot();
         const selectedCrypto = cryptoOptions.value;
         // Change the button to "Terminate Process" in red.
@@ -284,29 +353,42 @@
         startProcessButton.style.background = '#f00';
         processActive = true;
         
-        // Slowed boot sequence messages with varying delays.
+        // Cumulative boot sequence delays.
+        let cumulativeDelay = 0;
         const bootMessages = [
-          { text: 'Connecting to Tornet Servers...', delay: 1000 },
-          { text: 'Authentication complete.', delay: 2000 },
-          { text: 'Loading Infinity Miner program...', delay: 3000 },
-          { text: 'Initializing mining protocols...', delay: 4000 },
-          { text: `Boot sequence complete. Preparing to mine ${selectedCrypto}...`, delay: 5000 }
+          { text: 'Initializing BIOS...', delay: 800 },
+          { text: 'Loading hardware diagnostics...', delay: 1200 },
+          { text: 'Checking CPU: AMD Ryzen Threadripper Pro 3995WX...', delay: 1500 },
+          { text: 'Memory check: 128GB DDR4 ECC Registered...', delay: 1500 },
+          { text: 'Connecting to secure network protocol...', delay: 1000 },
+          { text: 'Establishing a secure tunnel to Tornet Servers...', delay: 1500 },
+          { text: 'Server authentication: SHA-256 encryption active...', delay: 2000 },
+          { text: 'Authentication complete. User verified.', delay: 1000 },
+          { text: 'Loading Infinity Miner v4.3.1...', delay: 2500 },
+          { text: 'Allocating system resources for mining...', delay: 1000 },
+          { text: 'Configuring high-efficiency power distribution...', delay: 1500 },
+          { text: 'Calibrating GPU clusters...', delay: 2000 },
+          { text: 'Initializing mining protocols on ThreadRipper Pro...', delay: 2500 },
+          { text: 'Syncing with blockchain for optimal mining...', delay: 1500 },
+          { text: 'Boot sequence complete. Preparing to mine ' + selectedCrypto + '...', delay: 3000 },
+          { text: 'Operation complete. Mining instance is now live.', delay: 2000 }
         ];
         
         bootMessages.forEach(msgObj => {
+          cumulativeDelay += msgObj.delay;
           setTimeout(() => {
             appendLine(msgObj.text);
-          }, msgObj.delay);
+          }, cumulativeDelay);
         });
         
         // Begin the mining simulation after the boot sequence.
-        const miningStartDelay = bootMessages[bootMessages.length - 1].delay + 500;
+        const miningStartDelay = cumulativeDelay + 500;
         setTimeout(() => {
           appendLine('--- Mining Process Started ---');
           miningInterval = setInterval(() => {
             const randPart = generateRandomString(10);
             const balanceValue = getBalanceValue();
-            totalMined += balanceValue;
+            sessionMined += balanceValue;
             updateSessionPot();
             let miningLine = `Mining | ${selectedCrypto} | 1x${randPart} | BAL: ${balanceValue.toFixed(2)}`;
             appendLine(miningLine);
@@ -321,8 +403,11 @@
         clearInterval(miningInterval);
         terminal.innerHTML = '';
         const selectedCrypto = cryptoOptions.value;
-        let totalDisplay = totalMined.toFixed(2);
-        appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}): ${totalDisplay}`);
+        let sessionDisplay = sessionMined.toFixed(2);
+        // Add the session's mined total to the overall wallet balance.
+        walletBalance += sessionMined;
+        updateWalletBalanceDisplay();
+        appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}): ${sessionDisplay}`);
         setTimeout(() => {
           terminal.innerHTML = '';
           startProcessButton.textContent = 'Start Process';
@@ -338,6 +423,20 @@
           terminateMiningProcess();
         }
       });
+      
+      // Show wallet/portfolio page when the Wallet button is clicked.
+      walletButton.addEventListener('click', () => {
+        terminalContainer.style.display = 'none';
+        walletPage.style.display = 'flex';
+        updateWalletBalanceDisplay();
+      });
+      
+      // When the "Mine" button is clicked from nav, resume simulation view.
+      startMiningButton.addEventListener('click', () => {
+        walletPage.style.display = 'none';
+        terminalContainer.style.display = 'flex';
+      });
+      
     });
   </script>
 </body>
