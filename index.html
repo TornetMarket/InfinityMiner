@@ -1,61 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Infinity Miner</title>
-  <link rel="icon" type="image/png" href="miner.png">
+  <link rel="icon" type="image/png" href="miner.png" />
   <style>
-    /* Reset & Global */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* RESET & GLOBAL */
+    * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
-      height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #111;
-      color: #eee;
-      overflow: hidden;
+      height:100%; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background:#111; color:#eee; overflow:hidden;
     }
 
-    /* Splash */
+    /* SPLASH */
     #splash {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle, #111, #000);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 999;
-      animation: fadeIn 1s ease-in-out;
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:radial-gradient(circle,#111,#000);
+      display:flex; justify-content:center; align-items:center;
+      z-index:999; animation:fadeIn 1s ease-in-out;
     }
     #splash h1 {
-      font-size: 3rem; letter-spacing: 0.2rem; color: #4169e1;
+      font-size:3rem; letter-spacing:.2rem; color:#4169e1;
     }
-    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-    @keyframes fadeOut { from {opacity:1;} to {opacity:0;} }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+    @keyframes fadeOut { from{opacity:1;} to{opacity:0;} }
 
-    /* Main & Content */
-    #main { display: none; height: 100%; padding-bottom: 70px; }
+    /* MAIN & CONTENT */
+    #main { display:none; height:100%; padding-bottom:70px; }
     #content {
-      height: calc(100% - 70px);
-      padding: 20px;
-      overflow-y: auto; /* allow scrolling */
+      height:calc(100% - 70px); padding:20px; overflow-y:auto;
     }
 
-    /* Terminal */
+    /* TERMINAL */
     #terminal-container {
-      display: none; flex-direction: column; align-items: center;
-      margin-top: 20px;
+      display:none; flex-direction:column; align-items:center; margin-top:20px;
     }
-    #session-pot { margin-bottom: 20px; }
+    #session-pot { margin-bottom:20px; }
     #session-pot table {
-      width: 100%; max-width: 400px; border-collapse: collapse;
-      background: rgba(255,255,255,0.1); color: #fff;
+      width:100%; max-width:400px; border-collapse:collapse;
+      background:rgba(255,255,255,0.1); color:#fff;
     }
-    #session-pot th, #session-pot td {
+    #session-pot th,#session-pot td {
       padding:10px; border:1px solid #4169e1; text-align:center;
     }
     #terminal {
       width:100%; max-width:800px; height:300px;
       background:#000; border:2px solid #4169e1;
       padding:10px; overflow-y:auto;
-      font-family:monospace; font-size:0.9rem; line-height:1.4;
+      font-family:monospace; font-size:.9rem; line-height:1.4;
       color:#4169e1; margin-bottom:10px;
     }
     #crypto-select {
@@ -68,11 +61,11 @@
     #start-process {
       padding:10px 20px; font-size:1rem; cursor:pointer;
       background:#4169e1; border:none; color:#fff;
-      transition:background 0.3s; margin-bottom:20px;
+      transition:background .3s; margin-bottom:20px;
     }
     #start-process:hover { background:#5a7bd5; }
 
-    /* Wallet */
+    /* WALLET */
     #wallet-page {
       display:none; flex-direction:column; align-items:center;
       justify-content:center; height:100%; padding:20px;
@@ -87,20 +80,17 @@
     .wallet-action {
       padding:10px 20px; margin:10px; font-size:1rem;
       border:none; border-radius:4px; cursor:pointer;
-      background:#4169e1; color:#fff; transition:background 0.3s;
+      background:#4169e1; color:#fff; transition:background .3s;
     }
     .wallet-action:hover { background:#5a7bd5; }
     #wallet-actions {
       display:flex; flex-wrap:wrap; justify-content:center;
     }
 
-    /* Profile */
+    /* PROFILE */
     #profile-page {
-      display:none;
-      max-width:500px;
-      margin:20px auto;
-      padding:20px;
-      padding-bottom:100px; /* ensure bottom space */
+      display:none; max-width:500px; margin:20px auto;
+      padding:20px; padding-bottom:100px;
     }
     #profile-header {
       text-align:center; margin-bottom:20px;
@@ -114,24 +104,26 @@
     #profile-username { font-size:1.8rem; margin-bottom:5px; }
     #profile-session { font-size:1.1rem; color:#aaa; }
 
-    .info-panel {
-      background:#222; border:2px solid #4169e1;
-      border-radius:8px; padding:15px; margin-bottom:15px;
+    .account-container {
+      display:flex; flex-wrap:wrap; gap:20px; padding:20px;
+      background:#0a192f; color:#ccd6f6;
     }
-    .info-row {
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:10px; font-size:1.1rem;
+    .account-box, .account-group {
+      background:#112240; border:1px solid rgba(255,255,255,0.1);
+      padding:20px; border-radius:12px; flex:1 1 250px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
     }
-    .info-row span { flex:1; }
+    .account-box:hover, .account-group:hover {
+      border-color:#64ffda; transition:.3s;
+    }
+    .edit-btn {
+      background:none; border:none; color:#64ffda;
+      margin-left:10px; cursor:pointer; font-size:1rem;
+      transition:color .2s;
+    }
+    .edit-btn:hover { color:#fff; }
 
-    #close-profile {
-      display:block; width:100%; padding:12px; font-size:1rem;
-      cursor:pointer; background:#4169e1; border:none; color:#fff;
-      border-radius:4px; transition:background 0.3s; margin-top:20px;
-    }
-    #close-profile:hover { background:#5a7bd5; }
-
-    /* Footer Nav */
+    /* FOOTER */
     #navbar {
       position:fixed; bottom:0; left:0; width:100%; height:70px;
       background:#222; display:flex; justify-content:space-around;
@@ -139,33 +131,12 @@
     }
     #navbar button {
       background:none; border:none; color:#eee; font-size:1.2rem;
-      cursor:pointer; flex:1; height:100%; transition:background 0.3s;
+      cursor:pointer; flex:1; height:100%; transition:background .3s;
     }
     #navbar button:hover { background:rgba(255,255,255,0.1); }
     #wallet-button::before { content:"💼 Wallet"; }
     #profile-button::before { content:"👤 Profile"; }
     #start-mining-button::before { content:"⚙️ Mine"; }
-
-    /* Account Container for Profile */
-    .account-container {
-      display:flex; flex-wrap:wrap; gap:20px; padding:20px;
-      background-color:#0a192f; color:#ccd6f6;
-    }
-    .account-group, .account-box {
-      background-color:#112240; border:1px solid rgba(255,255,255,0.1);
-      padding:20px; border-radius:12px; flex:1 1 250px;
-      box-shadow:0 4px 15px rgba(0,0,0,0.2);
-    }
-    .account-group:hover, .account-box:hover {
-      border-color:#64ffda; transition:0.3s ease;
-    }
-    .edit-btn {
-      background:none; border:none; color:#64ffda;
-      margin-left:10px; cursor:pointer; font-size:1rem;
-      transition:color 0.2s;
-    }
-    .edit-btn:hover { color:#fff; }
-
   </style>
 </head>
 <body>
@@ -175,7 +146,7 @@
   <div id="main">
     <div id="content">
 
-      <!-- Terminal -->
+      <!-- Mining Terminal -->
       <div id="terminal-container">
         <div id="session-pot">
           <table>
@@ -186,18 +157,18 @@
         <div id="terminal"></div>
         <div id="crypto-select">
           <select id="crypto-options">
-            <option value="Bitcoin">Bitcoin (BTC)</option>
-            <option value="Monero">Monero (XMR)</option>
-            <option value="Ethereum">Ethereum (ETH)</option>
-            <option value="Litecoin">Litecoin (LTC)</option>
-            <option value="Ripple">Ripple (XRP)</option>
-            <option value="RichCoin">RichCoin (RTC)</option>
+            <option>Bitcoin (BTC)</option>
+            <option>Monero (XMR)</option>
+            <option>Ethereum (ETH)</option>
+            <option>Litecoin (LTC)</option>
+            <option>Ripple (XRP)</option>
+            <option>RichCoin (RTC)</option>
           </select>
           <button id="start-process">Start Process</button>
         </div>
       </div>
 
-      <!-- Wallet -->
+      <!-- Wallet Page -->
       <div id="wallet-page">
         <h2>Portfolio</h2>
         <div id="wallet-balance">$0.00</div>
@@ -209,45 +180,38 @@
         </div>
       </div>
 
-      <!-- Profile -->
+      <!-- Profile Page -->
       <div id="profile-page">
         <div id="profile-header">
           <div id="profile-pic">O</div>
           <h2 id="profile-username">Owner</h2>
           <p id="profile-session">Session ID: <span id="session-id"></span></p>
         </div>
-
         <div class="account-container">
-          <!-- Member Since -->
-          <div class="account-box"><p><strong>Member Since:</strong> Jan 2024</p></div>
-          <!-- Current Portfolio -->
+          <div class="account-box"><p><strong>Member Since:</strong> Jan 2024</p></div>
           <div class="account-box"><p><strong>Current Portfolio:</strong> $4,230.45</p></div>
-          <!-- Last Payout -->
           <div class="account-box">
             <p><strong>Last Payout:</strong> April 10, 2025</p>
-            <p><strong>– $650 Transfer to Chase Bank</strong></p>
+            <p><strong>– $650 Transfer to Chase Bank</strong></p>
           </div>
-          <!-- Grouped Block -->
           <div class="account-group">
-            <p><strong>Wallet Address:</strong> 1A1zP1eP5Q...
+            <p><strong>Wallet Address:</strong> 1A1zP1eP5Q...
               <button class="edit-btn" title="Edit">✏️</button>
             </p>
-            <p><strong>Mining Status:</strong> Inactive
+            <p><strong>Mining Status:</strong> <span id="mining-status">Inactive</span>
               <button class="edit-btn" title="Edit">✏️</button>
             </p>
-            <p><strong>Hash Rate:</strong> 130 MH/s
+            <p><strong>Hash Rate:</strong> 130 MH/s
               <button class="edit-btn" title="Edit">✏️</button>
             </p>
-            <p><strong>2FA Status:</strong> Enabled
+            <p><strong>2FA Status:</strong> Enabled
               <button class="edit-btn" title="Edit">✏️</button>
             </p>
-            <p><strong>Subscription Plan:</strong> Premium
+            <p><strong>Subscription Plan:</strong> Premium
               <button class="edit-btn" title="Edit">✏️</button>
             </p>
           </div>
         </div>
-
-        <button id="close-profile">Close Profile</button>
       </div>
 
     </div>
@@ -261,40 +225,99 @@
   </div>
 
   <script>
+    // Splash fade
     window.addEventListener('load', () => {
-      const splash = document.getElementById('splash');
+      const s = document.getElementById('splash');
       setTimeout(() => {
-        splash.style.animation = 'fadeOut 1s ease-in-out';
-        splash.addEventListener('animationend', () => {
-          splash.style.display = 'none';
-          document.getElementById('main').style.display = 'block';
-          document.getElementById('terminal-container').style.display = 'flex';
+        s.style.animation = 'fadeOut 1s ease-in-out';
+        s.addEventListener('animationend', () => {
+          s.style.display='none';
+          document.getElementById('main').style.display='block';
+          document.getElementById('terminal-container').style.display='flex';
         });
-      }, 2000);
+      },2000);
     });
 
     // Session ID
-    (()=>{
+    (() => {
       const el = document.getElementById('session-id');
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       let id='';
-      for(let i=0;i<8;i++) id += chars.charAt(Math.floor(Math.random()*chars.length));
-      if(el) el.textContent=id;
+      for(let i=0;i<8;i++) id+=chars.charAt(Math.floor(Math.random()*chars.length));
+      el.textContent = id;
     })();
 
-    // Nav logic
-    const termBtn = document.getElementById('start-mining-button');
-    const walletBtn = document.getElementById('wallet-button');
-    const profileBtn = document.getElementById('profile-button');
-    const termCon = document.getElementById('terminal-container');
-    const walletPg = document.getElementById('wallet-page');
-    const profilePg = document.getElementById('profile-page');
-    termBtn.onclick = () => { termCon.style.display='flex'; walletPg.style.display='none'; profilePg.style.display='none'; };
-    walletBtn.onclick = () => { walletPg.style.display='flex'; termCon.style.display='none'; profilePg.style.display='none'; };
-    profileBtn.onclick = () => { profilePg.style.display='block'; termCon.style.display='none'; walletPg.style.display='none'; };
-    document.getElementById('close-profile').onclick = () => { profilePg.style.display='none'; };
+    // Nav
+    const termBtn = document.getElementById('start-mining-button'),
+          walletBtn = document.getElementById('wallet-button'),
+          profileBtn= document.getElementById('profile-button'),
+          termCon = document.getElementById('terminal-container'),
+          walletPg = document.getElementById('wallet-page'),
+          profilePg= document.getElementById('profile-page');
+    termBtn.onclick = ()=>{ termCon.style.display='flex'; walletPg.style.display='none'; profilePg.style.display='none'; };
+    walletBtn.onclick= ()=>{ walletPg.style.display='flex'; profilePg.style.display='none'; termCon.style.display='none'; };
+    profileBtn.onclick=()=>{ profilePg.style.display='block'; termCon.style.display='none'; walletPg.style.display='none'; };
 
-    // (Your mining / wallet / profile scripts go here...)
+    // Mining Logic
+    const startBtn = document.getElementById('start-process'),
+          terminal   = document.getElementById('terminal'),
+          sessionTd  = document.getElementById('session-total'),
+          miningStatus = document.getElementById('mining-status');
+    let miningInterval, processActive=false, sessionMined=0;
+
+    function appendLine(txt){
+      const div=document.createElement('div');
+      div.textContent=txt;
+      terminal.appendChild(div);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+    function rndStr(len){
+      const c='abcdefghijklmnopqrstuvwxyz0123456789';
+      let s='';
+      for(let i=0;i<len;i++) s+=c.charAt(Math.floor(Math.random()*c.length));
+      return s;
+    }
+    function getBal(){
+      const r=Math.random();
+      return r<0.92?0.00:r<0.96?0.01:r<0.985?0.02:0.03;
+    }
+    function updatePot(){
+      sessionTd.textContent = sessionMined.toFixed(2);
+    }
+
+    function startMining(){
+      terminal.innerHTML='';
+      sessionMined=0; updatePot();
+      startBtn.textContent='Terminate Process';
+      startBtn.style.background='#f00';
+      processActive=true;
+      miningStatus.textContent='Active';
+
+      appendLine('--- Booting Infinity Miner v4.3.1 ---');
+      setTimeout(()=>{
+        appendLine('--- Mining Process Started ---');
+        miningInterval = setInterval(()=>{
+          const part = rndStr(10),
+                bal  = getBal();
+          sessionMined+=bal; updatePot();
+          appendLine(`Mining | ${document.getElementById('crypto-options').value} | 1x${part} | BAL: ${bal.toFixed(2)}`);
+        },100);
+      },1500);
+    }
+
+    function stopMining(){
+      if(!processActive) return;
+      processActive=false;
+      clearInterval(miningInterval);
+      startBtn.textContent='Start Process';
+      startBtn.style.background='#4169e1';
+      miningStatus.textContent='Inactive';
+      appendLine(`--- Terminated. Session mined: ${sessionMined.toFixed(2)} ---`);
+    }
+
+    startBtn.onclick = () => {
+      processActive? stopMining() : startMining();
+    };
   </script>
 </body>
 </html>
