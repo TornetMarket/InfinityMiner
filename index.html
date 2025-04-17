@@ -2,342 +2,185 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Infinity Miner</title>
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="miner.png">
   <style>
-    /* Reset & Global Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* Reset & Global */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #111; /* dark grey/almost black background */
+      background: #111;
       color: #eee;
       overflow: hidden;
     }
-    /* Splash Screen */
+
+    /* Splash */
     #splash {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: radial-gradient(circle, #111, #000);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      display: flex; justify-content: center; align-items: center;
       z-index: 999;
       animation: fadeIn 1s ease-in-out;
     }
     #splash h1 {
-      font-size: 3rem;
-      letter-spacing: 0.2rem;
-      color: #4169e1; /* Royal blue text */
+      font-size: 3rem; letter-spacing: 0.2rem; color: #4169e1;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    /* Main Content */
-    #main {
-      display: none; /* shown after splash */
-      height: 100%;
-      padding-bottom: 70px; /* space for nav bar */
-    }
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    @keyframes fadeOut { from {opacity:1;} to {opacity:0;} }
+
+    /* Main & Content */
+    #main { display: none; height: 100%; padding-bottom: 70px; }
     #content {
       height: calc(100% - 70px);
       padding: 20px;
+      overflow-y: auto; /* allow scrolling */
     }
-    /* Terminal Container */
+
+    /* Terminal */
     #terminal-container {
-      display: none;
-      flex-direction: column;
-      align-items: center;
+      display: none; flex-direction: column; align-items: center;
       margin-top: 20px;
     }
-    /* Wallet/Portfolio Page Container */
-    #wallet-page {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      padding: 20px;
-    }
-    /* Profile Page Container */
-    #profile-page {
-      display: none;
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-    /* Profile Header (outside info panel) */
-    #profile-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    #profile-pic {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: #111;
-      border: 4px solid #4169e1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      color: #4169e1;
-      margin-bottom: 10px;
-    }
-    #profile-username {
-      font-size: 1.8rem;
-      margin-bottom: 5px;
-    }
-    #profile-session {
-      font-size: 1.1rem;
-      color: #aaa;
-    }
-    /* Profile Panels */
-    .info-panel {
-      background: #222;
-      border: 2px solid #4169e1;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-    }
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-    }
-    .info-row span {
-      flex: 1;
-    }
-    /* Close Profile Button */
-    #close-profile {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      cursor: pointer;
-      background: #4169e1;
-      border: none;
-      color: #fff;
-      border-radius: 4px;
-      transition: background 0.3s;
-      margin-top: 20px;
-    }
-    #close-profile:hover {
-      background: #5a7bd5;
-    }
-    /* Session Pot placed above the terminal */
-    #session-pot {
-      margin-bottom: 20px;
-    }
+    #session-pot { margin-bottom: 20px; }
     #session-pot table {
-      border-collapse: collapse;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      width: 100%;
-      max-width: 400px;
+      width: 100%; max-width: 400px; border-collapse: collapse;
+      background: rgba(255,255,255,0.1); color: #fff;
     }
     #session-pot th, #session-pot td {
-      padding: 10px;
-      border: 1px solid #4169e1;
-      text-align: center;
+      padding:10px; border:1px solid #4169e1; text-align:center;
     }
-    /* Terminal */
     #terminal {
-      width: 100%;
-      max-width: 800px;
-      height: 300px;
-      background: #000;
-      border: 2px solid #4169e1;
-      padding: 10px;
-      overflow-y: auto;
-      font-family: monospace;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      color: #4169e1;
-      margin-bottom: 10px;
+      width:100%; max-width:800px; height:300px;
+      background:#000; border:2px solid #4169e1;
+      padding:10px; overflow-y:auto;
+      font-family:monospace; font-size:0.9rem; line-height:1.4;
+      color:#4169e1; margin-bottom:10px;
     }
-    /* Crypto Select */
     #crypto-select {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display:flex; flex-direction:column; align-items:center;
     }
     #crypto-options {
-      padding: 5px 10px;
-      font-size: 1rem;
-      margin-bottom: 10px;
-      background: #222;
-      color: #eee;
-      border: 1px solid #4169e1;
+      padding:5px 10px; font-size:1rem; margin-bottom:10px;
+      background:#222; color:#eee; border:1px solid #4169e1;
     }
     #start-process {
-      padding: 10px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-      background: #4169e1;
-      border: none;
-      color: #fff;
-      transition: background 0.3s;
-      margin-bottom: 20px;
+      padding:10px 20px; font-size:1rem; cursor:pointer;
+      background:#4169e1; border:none; color:#fff;
+      transition:background 0.3s; margin-bottom:20px;
     }
-    #start-process:hover {
-      background: #5a7bd5;
+    #start-process:hover { background:#5a7bd5; }
+
+    /* Wallet */
+    #wallet-page {
+      display:none; flex-direction:column; align-items:center;
+      justify-content:center; height:100%; padding:20px;
     }
-    /* Wallet/Portfolio Page Styling */
-    #wallet-page h2 {
-      margin-bottom: 20px;
-    }
+    #wallet-page h2 { margin-bottom:20px; }
     #wallet-balance {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: #222;
-      border: 4px solid #4169e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      color: #4169e1;
-      margin-bottom: 30px;
+      width:200px; height:200px; border-radius:50%;
+      background:#222; border:4px solid #4169e1;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.8rem; color:#4169e1; margin-bottom:30px;
     }
     .wallet-action {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      background: #4169e1;
-      color: #fff;
-      transition: background 0.3s;
+      padding:10px 20px; margin:10px; font-size:1rem;
+      border:none; border-radius:4px; cursor:pointer;
+      background:#4169e1; color:#fff; transition:background 0.3s;
     }
-    .wallet-action:hover {
-      background: #5a7bd5;
-    }
+    .wallet-action:hover { background:#5a7bd5; }
     #wallet-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display:flex; flex-wrap:wrap; justify-content:center;
     }
-    /* Bottom Navigation Bar */
+
+    /* Profile */
+    #profile-page {
+      display:none;
+      max-width:500px;
+      margin:20px auto;
+      padding:20px;
+      padding-bottom:100px; /* ensure bottom space */
+    }
+    #profile-header {
+      text-align:center; margin-bottom:20px;
+    }
+    #profile-pic {
+      width:150px; height:150px; border-radius:50%;
+      background:#111; border:4px solid #4169e1;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:3rem; color:#4169e1; margin-bottom:10px;
+    }
+    #profile-username { font-size:1.8rem; margin-bottom:5px; }
+    #profile-session { font-size:1.1rem; color:#aaa; }
+
+    .info-panel {
+      background:#222; border:2px solid #4169e1;
+      border-radius:8px; padding:15px; margin-bottom:15px;
+    }
+    .info-row {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:10px; font-size:1.1rem;
+    }
+    .info-row span { flex:1; }
+
+    #close-profile {
+      display:block; width:100%; padding:12px; font-size:1rem;
+      cursor:pointer; background:#4169e1; border:none; color:#fff;
+      border-radius:4px; transition:background 0.3s; margin-top:20px;
+    }
+    #close-profile:hover { background:#5a7bd5; }
+
+    /* Footer Nav */
     #navbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 70px;
-      background: #222;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border-top: 2px solid #4169e1;
+      position:fixed; bottom:0; left:0; width:100%; height:70px;
+      background:#222; display:flex; justify-content:space-around;
+      align-items:center; border-top:2px solid #4169e1;
     }
     #navbar button {
-      background: none;
-      border: none;
-      color: #eee;
-      font-size: 1.2rem;
-      cursor: pointer;
-      flex: 1;
-      height: 100%;
-      transition: background 0.3s;
+      background:none; border:none; color:#eee; font-size:1.2rem;
+      cursor:pointer; flex:1; height:100%; transition:background 0.3s;
     }
-    #navbar button:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    /* Icon Styling for Demo Purposes */
-    #wallet-button::before {
-      content: "💼 Wallet";
-    }
-    #profile-button::before {
-      content: "👤 Profile";
-    }
-    #start-mining-button::before {
-      content: "⚙️ Mine";
-    }
+    #navbar button:hover { background:rgba(255,255,255,0.1); }
+    #wallet-button::before { content:"💼 Wallet"; }
+    #profile-button::before { content:"👤 Profile"; }
+    #start-mining-button::before { content:"⚙️ Mine"; }
+
+    /* Account Container for Profile */
     .account-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      padding: 20px;
-      background-color: #0a192f;
-      color: #ccd6f6;
+      display:flex; flex-wrap:wrap; gap:20px; padding:20px;
+      background-color:#0a192f; color:#ccd6f6;
     }
-
-    .account-group,
-    .account-box {
-      background-color: #112240;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 12px;
-      flex: 1 1 250px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    .account-group, .account-box {
+      background-color:#112240; border:1px solid rgba(255,255,255,0.1);
+      padding:20px; border-radius:12px; flex:1 1 250px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
     }
-
-    /* Optional: Add hover effect */
-    .account-group:hover,
-    .account-box:hover {
-      border-color: #64ffda;
-      transition: 0.3s ease;
+    .account-group:hover, .account-box:hover {
+      border-color:#64ffda; transition:0.3s ease;
     }
-
     .edit-btn {
-    background: none;
-    border: none;
-    color: #64ffda;
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: color 0.2s;
-  }
-  .edit-btn:hover {
-    color: #fff;
-  }
-
+      background:none; border:none; color:#64ffda;
+      margin-left:10px; cursor:pointer; font-size:1rem;
+      transition:color 0.2s;
+    }
+    .edit-btn:hover { color:#fff; }
 
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash">
-    <h1>Infinity Miner</h1>
-  </div>
-  
-  <!-- Main Content -->
+
+  <div id="splash"><h1>Infinity Miner</h1></div>
+
   <div id="main">
     <div id="content">
-      <!-- Terminal & Simulation Area -->
+
+      <!-- Terminal -->
       <div id="terminal-container">
-        <!-- Session Pot placed above the terminal -->
         <div id="session-pot">
           <table>
-            <thead>
-              <tr>
-                <th colspan="2">Current Session Pot</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Total Mined</td>
-                <td id="session-total">0.00</td>
-              </tr>
-            </tbody>
+            <thead><tr><th colspan="2">Current Session Pot</th></tr></thead>
+            <tbody><tr><td>Total Mined</td><td id="session-total">0.00</td></tr></tbody>
           </table>
         </div>
         <div id="terminal"></div>
@@ -353,8 +196,8 @@
           <button id="start-process">Start Process</button>
         </div>
       </div>
-      
-      <!-- Wallet/Portfolio Page -->
+
+      <!-- Wallet -->
       <div id="wallet-page">
         <h2>Portfolio</h2>
         <div id="wallet-balance">$0.00</div>
@@ -365,297 +208,93 @@
           <button class="wallet-action">🏦 Deposit</button>
         </div>
       </div>
-      
-      <!-- Profile Page -->
+
+      <!-- Profile -->
       <div id="profile-page">
-        <!-- Profile Header (outside info panel) -->
         <div id="profile-header">
           <div id="profile-pic">O</div>
           <h2 id="profile-username">Owner</h2>
           <p id="profile-session">Session ID: <span id="session-id"></span></p>
         </div>
-        <div class="account-container">  
-          <!-- Individual Info Boxes -->
-          <div class="account-box">
-            <p><strong>Member Since:</strong> Jan 2024</p>
-          </div>
-        
-          <div class="account-box">
-            <p><strong>Current Portfolio:</strong> $4,230.45</p>
-          </div>
-        
-          <div class="account-box">
-            <p><strong>Last Payout:</strong> April 10, 2025</p>
-            <p><strong>-$650 Transfer to Chase Bank</strong></p>
-          </div>
 
-        <!-- Grouped Block -->
-        <div class="account-group">
-          <p><strong>Wallet Address:</strong> 1A1zP1eP5Q...
-            <button class="edit-btn" title="Edit Wallet Address">✏️</button>
-          </p>
-          <p><strong>Mining Status:</strong> Inactive
-            <button class="edit-btn" title="Edit Mining Status"></button>
-          </p>
-          <p><strong>Hash Rate:</strong> 130 MH/s
-            <button class="edit-btn" title="Edit Hash Rate"></button>
-          </p>
-          <p><strong>2FA Status:</strong> Enabled
-            <button class="edit-btn" title="Edit 2FA Status"></button>
-          </p>
-          <p><strong>Subscription Plan:</strong> Premium
-            <button class="edit-btn" title="Edit Subscription Plan"></button>
-          </p>
+        <div class="account-container">
+          <!-- Member Since -->
+          <div class="account-box"><p><strong>Member Since:</strong> Jan 2024</p></div>
+          <!-- Current Portfolio -->
+          <div class="account-box"><p><strong>Current Portfolio:</strong> $4,230.45</p></div>
+          <!-- Last Payout -->
+          <div class="account-box">
+            <p><strong>Last Payout:</strong> April 10, 2025</p>
+            <p><strong>– $650 Transfer to Chase Bank</strong></p>
+          </div>
+          <!-- Grouped Block -->
+          <div class="account-group">
+            <p><strong>Wallet Address:</strong> 1A1zP1eP5Q...
+              <button class="edit-btn" title="Edit">✏️</button>
+            </p>
+            <p><strong>Mining Status:</strong> Inactive
+              <button class="edit-btn" title="Edit">✏️</button>
+            </p>
+            <p><strong>Hash Rate:</strong> 130 MH/s
+              <button class="edit-btn" title="Edit">✏️</button>
+            </p>
+            <p><strong>2FA Status:</strong> Enabled
+              <button class="edit-btn" title="Edit">✏️</button>
+            </p>
+            <p><strong>Subscription Plan:</strong> Premium
+              <button class="edit-btn" title="Edit">✏️</button>
+            </p>
+          </div>
         </div>
 
-        </div>
-        
-      
+        <button id="close-profile">Close Profile</button>
+      </div>
+
     </div>
-    <!-- Bottom Navigation Bar -->
+
+    <!-- Footer Nav -->
     <nav id="navbar">
       <button id="wallet-button"></button>
       <button id="start-mining-button"></button>
       <button id="profile-button"></button>
     </nav>
   </div>
-  
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log("DOM loaded");
-      
-      // Remove the splash screen after 3 seconds.
+    window.addEventListener('load', () => {
+      const splash = document.getElementById('splash');
       setTimeout(() => {
-        const splash = document.getElementById('splash');
-        if (splash) {
-          console.log("Attempting to fade out splash screen...");
-          splash.style.animation = 'fadeOut 1s ease-in-out';
-          setTimeout(() => {
-            splash.style.display = 'none';
-            const mainContent = document.getElementById('main');
-            if (mainContent) {
-              mainContent.style.display = 'block';
-            }
-            document.body.style.overflow = 'auto';
-            console.log("Splash screen removed; main content displayed.");
-          }, 1000);
-        } else {
-          console.error("Splash element not found!");
-        }
-      }, 3000);
-  
-      // Generate a random session ID when the page loads.
-      const sessionIdElement = document.getElementById('session-id');
-      function generateSessionID(length) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let id = '';
-        for (let i = 0; i < length; i++) {
-          id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-      }
-      if (sessionIdElement) {
-        sessionIdElement.textContent = generateSessionID(8);
-      }
-  
-      // Element references.
-      const startMiningButton = document.getElementById('start-mining-button');
-      const terminalContainer = document.getElementById('terminal-container');
-      const terminal = document.getElementById('terminal');
-      const startProcessButton = document.getElementById('start-process');
-      const cryptoOptions = document.getElementById('crypto-options');
-      const sessionTotalCell = document.getElementById('session-total');
-      const walletButton = document.getElementById('wallet-button');
-      const walletPage = document.getElementById('wallet-page');
-      const walletBalanceCircle = document.getElementById('wallet-balance');
-      const profileButton = document.getElementById('profile-button');
-      const profilePage = document.getElementById('profile-page');
-      const closeProfileButton = document.getElementById('close-profile');
-      const profileBalanceSpan = document.getElementById('profile-balance');
-  
-      // Process control variables.
-      let miningInterval = null;
-      let processActive = false;
-      let sessionMined = 0; // Running total of mined crypto for the session.
-      let walletBalance = 0; // Global wallet balance.
-  
-      // Function to update the mining status in the profile page.
-      function updateProfileInfo() {
-        const miningStatus = document.getElementById('mining-status');
-        if (miningStatus) {
-          miningStatus.textContent = "Mining Status: " + (processActive ? "Active" : "Inactive");
-        }
-        updateProfileBalance();
-      }
-  
-      // Show terminal (mining) when the Mine button is clicked.
-      startMiningButton.addEventListener('click', () => {
-        terminalContainer.style.display = 'flex';
-        walletPage.style.display = 'none';
-        profilePage.style.display = 'none';
-      });
-  
-      // Append a line to the terminal.
-      function appendLine(text) {
-        const line = document.createElement('div');
-        line.textContent = text;
-        terminal.appendChild(line);
-        terminal.scrollTop = terminal.scrollHeight;
-      }
-  
-      // Generate a random alphanumeric string.
-      function generateRandomString(length) {
-        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-          result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-      }
-  
-      // Get the mined balance based on selected crypto.
-      function getBalanceValue(crypto) {
-        let rand = Math.random();
-        if (crypto === "Bitcoin") {
-          if (rand < 0.98) return 0.00;
-          else if (rand < 0.98 + 0.0175) return 0.01;
-          else return 0.03;
-        } else if (crypto === "Ethereum") {
-          if (rand < 0.97) return 0.00;
-          else if (rand < 0.97 + 0.02) return 0.01;
-          else return 0.03;
-        } else if (crypto === "Monero") {
-          if (rand < 0.96) return 0.00;
-          else if (rand < 0.96 + 0.03) return 0.01;
-          else return 0.03;
-        } else {
-          // Default distribution for other coins:
-          if (rand < 0.92) return 0.00;
-          else if (rand < 0.92 + 0.04) return 0.01;
-          else if (rand < 0.92 + 0.04 + 0.025) return 0.02;
-          else return 0.03;
-        }
-      }
-  
-      // Update the session pot display.
-      function updateSessionPot() {
-        sessionTotalCell.textContent = sessionMined.toFixed(2);
-      }
-  
-      // Update wallet balance display (each 0.01 mined equals $0.10).
-      function updateWalletBalanceDisplay() {
-        walletBalanceCircle.textContent = '$' + (walletBalance * 10).toFixed(2);
-      }
-  
-      // Update Profile Portfolio Balance (same as walletBalance).
-      function updateProfileBalance() {
-        profileBalanceSpan.textContent = (walletBalance * 10).toFixed(2);
-      }
-  
-      // Start mining process including boot sequence and mining loop.
-      function startMiningProcess() {
-        terminal.innerHTML = ''; // Clear the terminal.
-        sessionMined = 0; // Reset session total.
-        updateSessionPot();
-        const selectedCrypto = cryptoOptions.value;
-        // Change the button to "Terminate Process" in red.
-        startProcessButton.textContent = 'Terminate Process';
-        startProcessButton.style.background = '#f00';
-        processActive = true;
-  
-        // Cumulative boot sequence delays.
-        let cumulativeDelay = 0;
-        const bootMessages = [
-          { text: 'Initializing BIOS...', delay: 800 },
-          { text: 'Loading hardware diagnostics...', delay: 1200 },
-          { text: 'Checking CPU: AMD Ryzen Threadripper Pro 3995WX...', delay: 1500 },
-          { text: 'Memory check: 128GB DDR4 ECC Registered...', delay: 1500 },
-          { text: 'Connecting to secure network protocol...', delay: 1000 },
-          { text: 'Establishing a secure tunnel to Tornet Servers...', delay: 1500 },
-          { text: 'Server authentication: SHA-256 encryption active...', delay: 2000 },
-          { text: 'Authentication complete. User verified.', delay: 1000 },
-          { text: 'Loading Infinity Miner v4.3.1...', delay: 2500 },
-          { text: 'Allocating system resources for mining...', delay: 1000 },
-          { text: 'Configuring high-efficiency power distribution...', delay: 1500 },
-          { text: 'Calibrating GPU clusters...', delay: 2000 },
-          { text: 'Initializing mining protocols on ThreadRipper Pro...', delay: 2500 },
-          { text: 'Syncing with blockchain for optimal mining...', delay: 1500 },
-          { text: 'Boot sequence complete. Preparing to mine ' + selectedCrypto + '...', delay: 3000 },
-          { text: 'Operation complete. Mining instance is now live.', delay: 2000 }
-        ];
-  
-        bootMessages.forEach(msgObj => {
-          cumulativeDelay += msgObj.delay;
-          setTimeout(() => {
-            appendLine(msgObj.text);
-          }, cumulativeDelay);
+        splash.style.animation = 'fadeOut 1s ease-in-out';
+        splash.addEventListener('animationend', () => {
+          splash.style.display = 'none';
+          document.getElementById('main').style.display = 'block';
+          document.getElementById('terminal-container').style.display = 'flex';
         });
-  
-        // Begin the mining simulation after the boot sequence.
-        const miningStartDelay = cumulativeDelay + 500;
-        setTimeout(() => {
-          appendLine('--- Mining Process Started ---');
-          miningInterval = setInterval(() => {
-            const randPart = generateRandomString(10);
-            const balanceValue = getBalanceValue(cryptoOptions.value);
-            sessionMined += balanceValue;
-            updateSessionPot();
-            let miningLine = `Mining | ${cryptoOptions.value} | 1x${randPart} | BAL: ${balanceValue.toFixed(2)}`;
-            appendLine(miningLine);
-          }, 100);
-        }, miningStartDelay);
-      }
-  
-      // Terminate the mining process.
-      function terminateMiningProcess() {
-        if (!processActive) return;
-        processActive = false;
-        clearInterval(miningInterval);
-        terminal.innerHTML = '';
-        const selectedCrypto = cryptoOptions.value;
-        let sessionDisplay = sessionMined.toFixed(2);
-        // Add the session's mined total to the overall wallet balance.
-        walletBalance += sessionMined;
-        updateWalletBalanceDisplay();
-        appendLine(`Terminating mining session. Total crypto mined (${selectedCrypto}): ${sessionDisplay}`);
-        setTimeout(() => {
-          terminal.innerHTML = '';
-          startProcessButton.textContent = 'Start Process';
-          startProcessButton.style.background = '#4169e1';
-        }, 3000);
-      }
-  
-      // Toggle the process when the Start/Terminate Process button is clicked.
-      startProcessButton.addEventListener('click', () => {
-        if (!processActive) {
-          startMiningProcess();
-        } else {
-          terminateMiningProcess();
-        }
-      });
-  
-      // Show wallet/portfolio page when the Wallet button is clicked.
-      walletButton.addEventListener('click', () => {
-        terminalContainer.style.display = 'none';
-        walletPage.style.display = 'flex';
-        profilePage.style.display = 'none';
-        updateWalletBalanceDisplay();
-      });
-  
-      // Show profile page when the Profile button is clicked.
-      profileButton.addEventListener('click', () => {
-        terminalContainer.style.display = 'none';
-        walletPage.style.display = 'none';
-        profilePage.style.display = 'block';
-        updateProfileInfo();
-      });
-  
-      // Close Profile button returns to the mining simulation.
-      closeProfileButton.addEventListener('click', () => {
-        profilePage.style.display = 'none';
-        terminalContainer.style.display = 'flex';
-      });
+      }, 2000);
     });
+
+    // Session ID
+    (()=>{
+      const el = document.getElementById('session-id');
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let id='';
+      for(let i=0;i<8;i++) id += chars.charAt(Math.floor(Math.random()*chars.length));
+      if(el) el.textContent=id;
+    })();
+
+    // Nav logic
+    const termBtn = document.getElementById('start-mining-button');
+    const walletBtn = document.getElementById('wallet-button');
+    const profileBtn = document.getElementById('profile-button');
+    const termCon = document.getElementById('terminal-container');
+    const walletPg = document.getElementById('wallet-page');
+    const profilePg = document.getElementById('profile-page');
+    termBtn.onclick = () => { termCon.style.display='flex'; walletPg.style.display='none'; profilePg.style.display='none'; };
+    walletBtn.onclick = () => { walletPg.style.display='flex'; termCon.style.display='none'; profilePg.style.display='none'; };
+    profileBtn.onclick = () => { profilePg.style.display='block'; termCon.style.display='none'; walletPg.style.display='none'; };
+    document.getElementById('close-profile').onclick = () => { profilePg.style.display='none'; };
+
+    // (Your mining / wallet / profile scripts go here...)
   </script>
 </body>
 </html>
